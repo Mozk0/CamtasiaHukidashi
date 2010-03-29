@@ -1,4 +1,4 @@
-(ns clojure.camtasia.serif
+(ns camtasia.hukidashi
   (:require [clojure.zip :as z]
             [clojure.contrib.zip-filter :as zf]
             [clojure.contrib.zip-filter.xml :as zfx]
