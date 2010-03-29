@@ -1,0 +1,3 @@
+Usage:
+java -jar hukidashi.jar a.camproj
+cat output.text
