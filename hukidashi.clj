@@ -34,14 +34,10 @@
   (zfx/xml-> zxml zf/children :Overlay_Array zf/children))
 
 (defn- get-start [zxml]
-  (BigInteger.
-   (first
-    (zfx/xml-> zxml zf/children :Start z/down z/node))))
+  (BigInteger. (first (zfx/xml-> zxml zf/children :Start z/down z/node))))
 
 (defn- get-content [zxml]
-  (str
-   (first
-    (zfx/xml-> zxml zf/children :strOverlayRichText z/down z/node))))
+  (str (first (zfx/xml-> zxml zf/children :strOverlayRichText z/down z/node))))
 
 (def $1 fnext) ;;; accessor
 
