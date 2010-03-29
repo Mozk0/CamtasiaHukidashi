@@ -1,3 +1,2 @@
-Usage:
-java -jar hukidashi.jar a.camproj
+java -jar hukidashi.jar test.camproj
 cat output.text
