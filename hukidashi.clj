@@ -6,7 +6,7 @@
             [clojure.contrib.duck-streams :as io])
   (:gen-class))
 
-(declare get-serif
+(declare get-hukidashi
          get-overlay-array-objects
          get-start
          get-sjis-string
@@ -20,10 +20,10 @@
            (s/str-join ""
                        (interleave
                         (repeat " ")
-                        (get-serif filename)
+                        (get-hukidashi filename)
                         (repeat "\n")))))
 
-(defn- get-serif [filename]
+(defn- get-hukidashi [filename]
   (let [zxml (z/xml-zip (clojure.xml/parse filename))]
     (map parse-content
          (sort-by :start
@@ -42,17 +42,17 @@
 (def $1 fnext) ;;; accessor
 
 (defn- parse-content [content]
-  (let [c (->> content
-               :content
-               (s/re-gsub #"\n+" " ")
-               (s/re-gsub #"\\\{" "{")
-               (s/re-gsub #"\\\}" "}")
-               (s/re-gsub #"\\\?" "?"))
-        serif ($1 (re-find #"\\viewkind4(.+)}" c))]
-    (s/str-join ""
-                (re-map get-sjis-string
-                        #"(\\'[0-9a-f][0-9a-f])+"
-                        (s/re-gsub #"\\[a-z0-9]+ ?" "" serif)))))
+  (->> content
+       :content
+       (s/re-gsub #"\n+" " ")
+       (s/re-gsub #"\\\{" "{")
+       (s/re-gsub #"\\\}" "}")
+       (s/re-gsub #"\\\?" "?")
+       (re-find #"\\viewkind4(.+)}")
+       $1
+       (s/re-gsub #"\\[a-z0-9]+ ?" "")
+       (re-map get-sjis-string #"(\\'[0-9a-f][0-9a-f])+")
+       (s/str-join "")))
 
 (defn- get-sjis-string [str]
   (let [arr (filter identity ;;; remove nils
