@@ -67,19 +67,19 @@
            (byte (nth arr idx)))
      "SJIS")))
 
-(defn- re-map [fn regex str]
-  "apply fn to the substrings regex matched"
+(defn- re-map [f regex str]
+  "apply f to the substrings regex matched"
   (let [rp (s/re-partition regex str)
         matches (map last (partition 2 rp))
         mismatches (map first (partition 1 2 rp))]
     (interleave mismatches
-                (concat (map fn matches) [""]))))
+                (concat (map f matches) [""]))))
 
-(defn- re-map-double [fn1 fn2 regex str]
-  "apply fn1 to the substrings regex matched
-   apply fn2 to the substrings regex did not match"
+(defn- re-map-double [f1 f2 regex str]
+  "apply f1 to the substrings regex matched
+   apply f2 to the substrings regex did not match"
   (let [rp (s/re-partition regex str)
         matches (map last (partition 2 rp))
         mismatches (map first (partition 1 2 rp))]
-    (interleave (map fn2 mismatches)
-                (concat (map fn1 matches) [""]))))
+    (interleave (map f2 mismatches)
+                (concat (map f1 matches) [""]))))
