@@ -13,7 +13,11 @@
          get-content
          parse-content
          re-map
-         re-map-double)
+         re-map-double
+         get-byte-array
+         remove-nils
+         remove-empty-strings
+         remove-consecutive-duplicates)
 
 (defn -main [filename]
   (io/spit "output.txt"
@@ -25,11 +29,20 @@
 
 (defn- get-hukidashi [filename]
   (let [zxml (z/xml-zip (clojure.xml/parse filename))]
-    (filter #(not= % "")
-            (map parse-content
-                 (sort-by :start
-                          (map (fn [%]  {:start (get-start %), :content (get-content %)})
-                               (get-overlay-array-objects zxml)))))))
+    (remove-consecutive-duplicates
+     (remove-empty-strings
+      (map parse-content
+           (sort-by :start
+                    (map (fn [%]  {:start (get-start %), :content (get-content %)})
+                         (get-overlay-array-objects zxml))))))))
+
+(defn- remove-empty-strings [coll]
+  (filter #(not= % "") coll))
+
+(defn- remove-consecutive-duplicates [coll]
+  (map last
+       (filter (fn [[a b]] (not= a b))
+               (partition 2 1 (cons nil coll)))))
 
 (defn- get-overlay-array-objects [zxml]
   (zfx/xml-> zxml zf/children :Overlay_Array zf/children))
@@ -58,17 +71,20 @@
        (s/str-join "")))
 
 (defn- get-sjis-string [str]
-  (let [arr (filter identity ;;; remove nils
-                    (re-map-double #(Integer/parseInt % 16)
-                                   (fn [%] nil)
-                                   #"[0-9a-f][0-9a-f]"
-                                   (first str)))
-        len  (count arr)
-        arr2 (make-array Byte/TYPE len)]
-    (String.
-     (amap arr2 idx ret
-           (byte (nth arr idx)))
-     "SJIS")))
+  (let [arr (remove-nils
+             (re-map-double #(Integer/parseInt % 16)
+                            (fn [%] nil)
+                            #"[0-9a-f][0-9a-f]"
+                            (first str)))]
+    (String. (get-byte-array arr) "SJIS")))
+
+(defn- get-byte-array [coll]
+  (let [res (make-array Byte/TYPE (count coll))]
+    (amap res idx ret
+          (byte (nth coll idx)))))
+
+(defn- remove-nils [coll]
+  (filter identity coll))
 
 (defn- re-map [f regex str]
   "apply f to the substrings regex matched"
