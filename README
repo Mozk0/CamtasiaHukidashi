@@ -1,2 +1,13 @@
-java -jar hukidashi.jar test.camproj
-cat output.text
+$ ls
+test.camproj
+test.mov
+hukidashi.jar
+
+$ java -jar hukidashi.jar test
+
+$ ls
+output.txt
+capture.sh
+test.camproj
+test.mov
+hukidashi.jar
