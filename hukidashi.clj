@@ -25,10 +25,11 @@
 
 (defn- get-hukidashi [filename]
   (let [zxml (z/xml-zip (clojure.xml/parse filename))]
-    (map parse-content
-         (sort-by :start
-                  (map (fn [%] {:start (get-start %), :content (get-content %)})
-                       (get-overlay-array-objects zxml))))))
+	(filter #(not= % "")
+			(map parse-content
+				 (sort-by :start
+						  (map (fn [%]  {:start (get-start %), :content (get-content %)})
+							   (get-overlay-array-objects zxml)))))))
 
 (defn- get-overlay-array-objects [zxml]
   (zfx/xml-> zxml zf/children :Overlay_Array zf/children))
@@ -39,7 +40,9 @@
 (defn- get-content [zxml]
   (str (first (zfx/xml-> zxml zf/children :strOverlayRichText z/down z/node))))
 
-(def $1 fnext) ;;; accessor
+(defn $1 [x] (if x
+			   (fnext x)
+			   ""))
 
 (defn- parse-content [content]
   (->> content
