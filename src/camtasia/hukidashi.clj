@@ -7,64 +7,64 @@
   (:gen-class))
 
 (declare get-hukidashi get-overlay-array-objects get-start get-end
-		 get-sjis-string get-content parse-content re-map re-map-double
-		 get-byte-array remove-nils remove-empty-strings get-timing
-		 remove-consecutive-duplicates $1 get-clips get-clipid
-		 get-clip-map-index get-dshowcontrol-clipmap-objects
-		 get-media-start get-media-end)
+         get-sjis-string get-content parse-content re-map re-map-double
+         get-byte-array remove-nils remove-empty-strings get-timing
+         remove-consecutive-duplicates $1 get-clips get-clipid
+         get-clip-map-index get-dshowcontrol-clipmap-objects
+         get-media-start get-media-end)
 
 (defn -main [filename]
   (let [zxml           (z/xml-zip (clojure.xml/parse (str filename ".camproj")))
-		clips          (get-clips zxml)
-		hukidashies    (get-hukidashi zxml clips)
-		time-format    (java.text.DecimalFormat. "##.0")
-		times          (distinct (map #(.format time-format
-												(float (get-timing clips %))) hukidashies))
-		movie-filename (str filename ".mov")
-		output-format  (java.text.DecimalFormat. "000")
-		filenames      (map #(. output-format format %)
-							(iterate inc 0))]
+        clips          (get-clips zxml)
+        hukidashies    (get-hukidashi zxml clips)
+        time-format    (java.text.DecimalFormat. "##.0")
+        times          (distinct (map #(.format time-format
+                                                (float (get-timing clips %))) hukidashies))
+        movie-filename (str filename ".mov")
+        output-format  (java.text.DecimalFormat. "000")
+        filenames      (map #(. output-format format %)
+                            (iterate inc 0))]
 
-	(io/spit "output.txt"
-			 (s/str-join ""
-						 (interleave
-						  (repeat " ")
-						  (map :content hukidashies)
-						  ;; (repeat " ")
-						  ;; hukidashies
-						  (repeat "\n"))))
+    (io/spit "output.txt"
+             (s/str-join ""
+                         (interleave
+                          (repeat " ")
+                          (map :content hukidashies)
+                          ;; (repeat " ")
+                          ;; hukidashies
+                          (repeat "\n"))))
 
-	(io/spit "capture.sh"
-			 (s/str-join ""
-						 (interleave
-						  (map #(str "ffmpeg -i " movie-filename ;input filename
-									 " -f image2 -ss " %1 ;time
-									 " " %2 ".png") ;output filename
-							   times
-							   filenames)
-						  (repeat "\n"))))))
+    (io/spit "capture.sh"
+             (s/str-join ""
+                         (interleave
+                          (map #(str "ffmpeg -i " movie-filename ;input filename
+                                     " -f image2 -ss " %1 ;time
+                                     " " %2 ".png") ;output filename
+                               times
+                               filenames)
+                          (repeat "\n"))))))
 
 (defn- get-hukidashi [zxml clips]
   (remove-consecutive-duplicates
    (remove-empty-strings
-	(sort-by #(get-timing clips %)
-			 (map (fn [%]
-					  {:start   (get-start %)
-					  :end      (get-end %)  
-					  :content  (get-content %)
-					  :clipid   (get-clipid %) })
-				  (get-overlay-array-objects zxml))))))
+    (sort-by #(get-timing clips %)
+             (map (fn [%]
+                    {:start   (get-start %)
+                     :end      (get-end %)  
+                     :content  (get-content %)
+                     :clipid   (get-clipid %) })
+                  (get-overlay-array-objects zxml))))))
 
 (defn- get-clips [zxml]
   (let [dscco (get-dshowcontrol-clipmap-objects zxml)]
-	(apply hash-map
-		   (interleave
-			(map get-clip-map-index dscco)
-			(map (fn [a b c d] {:start a :end b :media-start c :media-end d})
-				 (map get-start dscco)
-				 (map get-end dscco)
-				 (map get-media-start dscco)
-				 (map get-media-end dscco))))))
+    (apply hash-map
+           (interleave
+            (map get-clip-map-index dscco)
+            (map (fn [a b c d] {:start a :end b :media-start c :media-end d})
+                 (map get-start dscco)
+                 (map get-end dscco)
+                 (map get-media-start dscco)
+                 (map get-media-end dscco))))))
 
 (defn- get-overlay-array-objects [zxml]
   (zfx/xml-> zxml zf/children :Overlay_Array zf/children))
@@ -95,10 +95,10 @@
 
 (defn- get-timing [clips hukidashi] ;;camproj files are intricated
   (let [clipid (:clipid hukidashi)]
-	(/ (+ (:start (clips clipid))
-		  (/ (+ (:start hukidashi) (:end hukidashi)) 2)
-		  (- (:media-start (clips clipid))))
-	   10000000)))
+    (/ (+ (:start (clips clipid))
+          (/ (+ (:start hukidashi) (:end hukidashi)) 2)
+          (- (:media-start (clips clipid))))
+       10000000)))
 
 (defn- remove-empty-strings [coll]
   (filter #(not= (:content %) "") coll))
@@ -121,8 +121,8 @@
        (s/str-join "")))
 
 (defn- $1 [x] (if x
-               (fnext x)
-               ""))
+                (fnext x)
+                ""))
 
 (defn- get-sjis-string [str]
   (let [arr (remove-nils
