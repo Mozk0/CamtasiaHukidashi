@@ -53,7 +53,7 @@
 (defn- get-content [zxml]
   (str (first (zfx/xml-> zxml zf/children :strOverlayRichText z/down z/node))))
 
-(defn $1 [x] (if x
+(defn- $1 [x] (if x
                (fnext x)
                ""))
 
