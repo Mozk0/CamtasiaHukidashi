@@ -6,8 +6,20 @@ hukidashi.jar
 $ java -jar hukidashi.jar test
 
 $ ls
-output.txt
-capture.sh
+testoutput.txt
+testcapture.sh
+test.camproj
+test.mov
+hukidashi.jar
+
+$ sh testcapture.sh
+...
+$ ls
+test000.png
+test001.png
+...
+testoutput.txt
+testcapture.sh
 test.camproj
 test.mov
 hukidashi.jar
