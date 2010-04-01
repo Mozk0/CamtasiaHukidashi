@@ -25,7 +25,7 @@
         filenames      (map #(. output-format format %)
                             (iterate inc 0))]
 
-    (io/spit "output.txt"
+    (io/spit (str filename "output.txt")
              (s/str-join ""
                          (interleave
                           (repeat " ")
@@ -34,12 +34,12 @@
                           ;; hukidashies
                           (repeat "\n"))))
 
-    (io/spit "capture.sh"
+    (io/spit (str filename "capture.sh")
              (s/str-join ""
                          (interleave
                           (map #(str "ffmpeg -i " movie-filename ;input filename
-                                     " -f image2 -ss " %1 ;time
-                                     " " %2 ".png") ;output filename
+                                     " -f image2 -ss " %1        ;time
+                                     " " filename %2 ".png")     ;output filename
                                times
                                filenames)
                           (repeat "\n"))))))
